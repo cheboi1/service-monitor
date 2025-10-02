@@ -1,0 +1,164 @@
+name: Service Health Monitor
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes
+  workflow_dispatch:
+
+jobs:
+  monitor-and-recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check All Services
+        id: check
+        run: |
+          response=$(curl -s -X POST https://api.uptimerobot.com/v2/getMonitors \
+            -d "api_key=${{ secrets.UPTIMEROBOT_API_KEY }}" \
+            -d "format=json" \
+            -d "logs=0")
+          
+          # Status codes: 0=paused, 1=not checked, 2=up, 8=seems down, 9=down
+          echo "m1=$(echo "$response" | jq -r '.monitors[0].status')" >> $GITHUB_OUTPUT
+          echo "m2=$(echo "$response" | jq -r '.monitors[1].status')" >> $GITHUB_OUTPUT
+          echo "m3=$(echo "$response" | jq -r '.monitors[2].status')" >> $GITHUB_OUTPUT
+          echo "m4=$(echo "$response" | jq -r '.monitors[3].status')" >> $GITHUB_OUTPUT
+          echo "m5=$(echo "$response" | jq -r '.monitors[4].status')" >> $GITHUB_OUTPUT
+          echo "m6=$(echo "$response" | jq -r '.monitors[5].status')" >> $GITHUB_OUTPUT
+          echo "m7=$(echo "$response" | jq -r '.monitors[6].status')" >> $GITHUB_OUTPUT
+          echo "m8=$(echo "$response" | jq -r '.monitors[7].status')" >> $GITHUB_OUTPUT
+          echo "m9=$(echo "$response" | jq -r '.monitors[8].status')" >> $GITHUB_OUTPUT
+          echo "m10=$(echo "$response" | jq -r '.monitors[9].status')" >> $GITHUB_OUTPUT
+          echo "m11=$(echo "$response" | jq -r '.monitors[10].status')" >> $GITHUB_OUTPUT
+          echo "m12=$(echo "$response" | jq -r '.monitors[11].status')" >> $GITHUB_OUTPUT
+
+      - name: Recover Service 1
+        if: steps.check.outputs.m1 == '9' || steps.check.outputs.m1 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_1 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_1 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_1 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_1 }}/restart"
+          fi
+
+      - name: Recover Service 2
+        if: steps.check.outputs.m2 == '9' || steps.check.outputs.m2 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_2 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_2 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_2 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_2 }}/restart"
+          fi
+
+      - name: Recover Service 3
+        if: steps.check.outputs.m3 == '9' || steps.check.outputs.m3 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_3 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_3 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_3 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_3 }}/restart"
+          fi
+
+      - name: Recover Service 4
+        if: steps.check.outputs.m4 == '9' || steps.check.outputs.m4 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_4 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_4 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_4 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_4 }}/restart"
+          fi
+
+      - name: Recover Service 5
+        if: steps.check.outputs.m5 == '9' || steps.check.outputs.m5 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_5 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_5 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_5 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_5 }}/restart"
+          fi
+
+      - name: Recover Service 6
+        if: steps.check.outputs.m6 == '9' || steps.check.outputs.m6 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_6 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_6 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_6 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_6 }}/restart"
+          fi
+
+      - name: Recover Service 7
+        if: steps.check.outputs.m7 == '9' || steps.check.outputs.m7 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_7 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_7 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_7 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_7 }}/restart"
+          fi
+
+      - name: Recover Service 8
+        if: steps.check.outputs.m8 == '9' || steps.check.outputs.m8 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_8 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_8 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_8 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_8 }}/restart"
+          fi
+
+      - name: Recover Service 9
+        if: steps.check.outputs.m9 == '9' || steps.check.outputs.m9 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_9 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_9 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_9 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_9 }}/restart"
+          fi
+
+      - name: Recover Service 10
+        if: steps.check.outputs.m10 == '9' || steps.check.outputs.m10 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_10 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_10 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_10 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_10 }}/restart"
+          fi
+
+      - name: Recover Service 11
+        if: steps.check.outputs.m11 == '9' || steps.check.outputs.m11 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_11 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_11 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_11 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_11 }}/restart"
+          fi
+
+      - name: Recover Service 12
+        if: steps.check.outputs.m12 == '9' || steps.check.outputs.m12 == '8'
+        run: |
+          curl -s "${{ secrets.SERVICE_URL_12 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_12 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_12 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_12 }}/restart"
+          fi
