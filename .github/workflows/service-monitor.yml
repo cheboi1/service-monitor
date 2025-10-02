@@ -2,7 +2,7 @@ name: Service Health Monitor
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,6 @@ jobs:
             -d "format=json" \
             -d "logs=0")
           
-          # Status codes: 0=paused, 1=not checked, 2=up, 8=seems down, 9=down
           echo "m1=$(echo "$response" | jq -r '.monitors[0].status')" >> $GITHUB_OUTPUT
           echo "m2=$(echo "$response" | jq -r '.monitors[1].status')" >> $GITHUB_OUTPUT
           echo "m3=$(echo "$response" | jq -r '.monitors[2].status')" >> $GITHUB_OUTPUT
@@ -27,9 +26,9 @@ jobs:
           echo "m7=$(echo "$response" | jq -r '.monitors[6].status')" >> $GITHUB_OUTPUT
           echo "m8=$(echo "$response" | jq -r '.monitors[7].status')" >> $GITHUB_OUTPUT
           echo "m9=$(echo "$response" | jq -r '.monitors[8].status')" >> $GITHUB_OUTPUT
-          echo "m10=$(echo "$response" | jq -r '.monitors[9].status')" >> $GITHUB_OUTPUT
-          echo "m11=$(echo "$response" | jq -r '.monitors[10].status')" >> $GITHUB_OUTPUT
-          echo "m12=$(echo "$response" | jq -r '.monitors[11].status')" >> $GITHUB_OUTPUT
+          echo "m10=$(echo "$response" | jq -r '.monitors[11].status')" >> $GITHUB_OUTPUT
+          echo "m11=$(echo "$response" | jq -r '.monitors[12].status')" >> $GITHUB_OUTPUT
+          echo "m12=$(echo "$response" | jq -r '.monitors[13].status')" >> $GITHUB_OUTPUT
 
       - name: Recover Service 1
         if: steps.check.outputs.m1 == '9' || steps.check.outputs.m1 == '8'
