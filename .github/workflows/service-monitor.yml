@@ -30,6 +30,7 @@ jobs:
           echo "m10=$(echo "$response" | jq -r '.monitors[11].status')" >> $GITHUB_OUTPUT
           echo "m11=$(echo "$response" | jq -r '.monitors[12].status')" >> $GITHUB_OUTPUT
           echo "m12=$(echo "$response" | jq -r '.monitors[13].status')" >> $GITHUB_OUTPUT
+          echo "m13=$(echo "$response" | jq -r '.monitors[14].status')" >> $GITHUB_OUTPUT
 
       - name: Recover Service 1
         if: steps.check.outputs.m1 == '9' || steps.check.outputs.m1 == '8'
@@ -292,5 +293,27 @@ jobs:
           else
             curl -H "Content-Type: application/json" \
               -d '{"embeds":[{"title":"✅ Service 12 Recovered","description":"Service woke up successfully","color":3066993}]}' \
+              "${{ secrets.DISCORD_WEBHOOK }}"
+          fi
+
+      - name: Recover Service 13
+        if: steps.check.outputs.m13 == '9' || steps.check.outputs.m13 == '8'
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"embeds":[{"title":"⚠️ Service 13 Down","description":"Attempting recovery...","color":15158332}]}' \
+            "${{ secrets.DISCORD_WEBHOOK }}"
+          
+          curl -s "${{ secrets.SERVICE_URL_13 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_13 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_13 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_13 }}/restart"
+            curl -H "Content-Type: application/json" \
+              -d '{"embeds":[{"title":"🔄 Service 13 Restarted","description":"Service has been restarted","color":16776960}]}' \
+              "${{ secrets.DISCORD_WEBHOOK }}"
+          else
+            curl -H "Content-Type: application/json" \
+              -d '{"embeds":[{"title":"✅ Service 13 Recovered","description":"Service woke up successfully","color":3066993}]}' \
               "${{ secrets.DISCORD_WEBHOOK }}"
           fi
