@@ -321,23 +321,22 @@ jobs:
 
       - name: Recover Service 14
         if: steps.check.outputs.m14 == '9' || steps.check.outputs.m14 == '8'
-          if: steps.check.outputs.m14 == '9' || steps.check.outputs.m14 == '8'
-          run: |
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"embeds":[{"title":"⚠️ Service 14 Down","description":"Attempting recovery...","color":15158332}]}' \
+            "${{ secrets.DISCORD_WEBHOOK }}"
+          
+          curl -s "${{ secrets.SERVICE_URL_14 }}" > /dev/null
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_14 }}")
+          if [ "$status" == "503" ]; then
+            curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_14 }}" \
+              "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_14 }}/restart"
             curl -H "Content-Type: application/json" \
-              -d '{"embeds":[{"title":"⚠️ Service 14 Down","description":"Attempting recovery...","color":15158332}]}' \
+              -d '{"embeds":[{"title":"🔄 Service 14 Restarted","description":"Service has been restarted","color":16776960}]}' \
               "${{ secrets.DISCORD_WEBHOOK }}"
-            
-            curl -s "${{ secrets.SERVICE_URL_14 }}" > /dev/null
-            sleep 10
-            status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SERVICE_URL_14 }}")
-            if [ "$status" == "503" ]; then
-              curl -X POST -H "Authorization: Bearer ${{ secrets.API_KEY_14 }}" \
-                "https://api.render.com/v1/services/${{ secrets.SERVICE_ID_14 }}/restart"
-              curl -H "Content-Type: application/json" \
-                -d '{"embeds":[{"title":"🔄 Service 14 Restarted","description":"Service has been restarted","color":16776960}]}' \
-                "${{ secrets.DISCORD_WEBHOOK }}"
-            else
-              curl -H "Content-Type: application/json" \
-                -d '{"embeds":[{"title":"✅ Service 14 Recovered","description":"Service woke up successfully","color":3066993}]}' \
-                "${{ secrets.DISCORD_WEBHOOK }}"
-            fi
+          else
+            curl -H "Content-Type: application/json" \
+              -d '{"embeds":[{"title":"✅ Service 14 Recovered","description":"Service woke up successfully","color":3066993}]}' \
+              "${{ secrets.DISCORD_WEBHOOK }}"
+          fi
