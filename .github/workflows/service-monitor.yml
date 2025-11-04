@@ -319,7 +319,8 @@ jobs:
               "${{ secrets.DISCORD_WEBHOOK }}"
           fi
 
-        - name: Recover Service 14
+      - name: Recover Service 14
+        if: steps.check.outputs.m14 == '9' || steps.check.outputs.m14 == '8'
           if: steps.check.outputs.m14 == '9' || steps.check.outputs.m14 == '8'
           run: |
             curl -H "Content-Type: application/json" \
